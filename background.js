@@ -3,9 +3,17 @@ class windowManager {
     browser.contextMenus.onClicked.addListener(() => {
       this.merge();
     });
+    
+    browser.commands.onCommand.addListener(async (command) => {
+      if (command === "merge-windows" && (await this.getCurrentWindows()).length != 1) {
+        this.merge();
+      }
+    });
+    
     browser.windows.onFocusChanged.addListener(() => {
       this.calculateContextMenu();
     });
+
     this.calculateContextMenu();
   }
 
@@ -33,8 +41,7 @@ class windowManager {
   async merge() {
     const windowMap = new Map();
     const windows = await this.getCurrentWindows();
-    let biggestCount = 0;
-    let biggest = null;
+    const target = await browser.windows.getCurrent();
     let repin = [];
     const promises = windows.map(async function (windowObj) {
       const tabs = await browser.tabs.query({windowId: windowObj.id});
@@ -44,18 +51,14 @@ class windowManager {
         }
         return tab.id;
       }));
-      if (tabs.length > biggestCount) {
-        biggest = windowObj;
-        biggestCount = tabs.length;
-      }
     });
     await Promise.all(promises);
     const repinTabs = await Promise.all(repin);
     windows.forEach((windowObj) => {
-      if (windowObj === biggest) {
+      if (windowObj === target) {
         return;
       }
-      browser.tabs.move(windowMap.get(windowObj), {index: -1, windowId: biggest.id});
+      browser.tabs.move(windowMap.get(windowObj), {index: -1, windowId: target.id});
     });
     repinTabs.forEach((tab) => {
       browser.tabs.update(tab.id, {pinned: true});

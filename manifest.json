@@ -4,12 +4,21 @@
     "contextMenus"
   ],
   "description": "Merge multiple windows together",
-  "homepage_url": "https://github.com/jonathanKingston/merge-windows",
+  "homepage_url": "https://github.com/edward-dunton/merge-windows",
   "manifest_version": 2,
   "name": "Merge Windows",
-  "version": "1.0.2",
+  "version": "1.1",
   "icons": {
     "96": "merge.svg"
+  },
+
+  "commands" : {
+    "merge-windows" : {
+      "suggested_key" : {
+        "default" : "Ctrl+Space"
+      },
+      "description" : "Merges all tabs onto the current window"
+    }
   },
 
   "background": {
